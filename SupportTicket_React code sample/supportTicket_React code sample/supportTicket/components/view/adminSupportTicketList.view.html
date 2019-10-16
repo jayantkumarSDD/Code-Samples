@@ -1,0 +1,376 @@
+<p-dialog modal="true" [contentStyle]="{'overflow':'auto'}" header="Confirmation" [width]="500" dismissableMask="true" position="center"
+  [(visible)]="resolutionNoteDialog" appendTo="body">
+  <div class="form-group">
+    <div class="row">
+      <div style="margin-top:10px;" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <span style="font-size: 15px; color: black;">
+          <i class="fa fa-question-circle"> Are you sure that you want to update the status?.</i>
+        </span>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <textarea type="text" [(ngModel)]="resNote" name="resNote" class="form-control" placeholder="Add resolution notes..."></textarea>
+      </div>
+    </div>
+  </div>
+  <p-footer>
+    <button type="button" pButton icon="fa fa-fw fa-check" (click)="updateSupTicket(supTicketId, resNote)" label="Yes"></button>
+    <button type="submit" (click)="resolutionNoteDialog = false" pButton icon="fa fa-fw fa-close" label="No"></button>
+  </p-footer>
+</p-dialog>
+
+<p-dialog header="Advance Find" [(visible)]="display" modal="modal" [responsive]="true" [width]="500" [minWidth]="300">
+  <div class="form-group">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+        <input type="text" [(ngModel)]="body.cmpName" name="cmpName" class="form-control" placeholder="Company Name">
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <input type="text" [(ngModel)]="body.facName" name="facName" class="form-control" placeholder="Facility Name">
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <p-calendar dateFormat="yy-mm-dd" [(ngModel)]="body.createdAt" placeholder="Created At" name="start date" [showIcon]="true"
+          [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2030"></p-calendar>
+      </div>
+    </div>
+  </div>
+  <p-footer>
+    <button type="button" pButton icon="fa fa-refresh" (click)="resetSearch()" label="Reset"></button>
+    <button type="submit" (click)="getAllSupportTickets();display=false" pButton icon="fa fa-search" label="Search"></button>
+  </p-footer>
+</p-dialog>
+<p-dialog header="Screenshot" [(visible)]="displayScreenshot" modal="modal" [responsive]="true">
+  <div class="form-group">
+    <div class="row">
+      <img [src]="screenShot" alt="screenshot" width="1000px" />
+    </div>
+  </div>
+</p-dialog>
+<p-dialog header="Screenshot" [(visible)]="displayScreenshot" modal="modal" [responsive]="true">
+  <div class="form-group">
+    <div class="row">
+      <img [src]="screenShot" alt="screenshot" width="1000px" />
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog header="View Support/Ticket" [(visible)]="supTicketViewDialoge" modal="modal" [responsive]="true" [width]="500"
+  [minWidth]="300">
+  <div class="form-group">
+    <div class="details-modal" *ngIf="supTicketInfo && supTicketInfo._id">
+      <div class="row details-modal-row">
+        <div class="col-sm-4">
+          <strong>Status :</strong>
+        </div>
+        <div class="col-sm-8">
+          {{(supTicketInfo.resolved == true)? 'Resolved': 'Unresolved'}}
+        </div>
+      </div>
+      <div class="row details-modal-row">
+        <div class="col-sm-4">
+          <strong>Date:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.createdAt | date: mediumDate}}
+        </div>
+      </div>
+      <div class="row details-modal-row">
+        <div class="col-sm-4">
+          <strong>Company:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.cmpName}}
+        </div>
+      </div>
+
+      <div class="row details-modal-row">
+        <div class="col-sm-4">
+          <strong>Regarding:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.supportRegarding}}
+        </div>
+      </div>
+      <div class="row details-modal-row" *ngIf="supTicketInfo.supportRegarding == 'facility'">
+        <div class="col-sm-4">
+          <strong>Facility:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.facName ? supTicketInfo.facName: 'N/A'}}
+        </div>
+      </div>
+      <div class="row details-modal-row">
+        <div class="col-sm-4">
+          <strong>Submitted By:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.userName}} ({{supTicketInfo.email}})
+        </div>
+      </div>
+      <div class="row details-modal-row">
+        <div class="col-sm-4">
+          <strong>Support/Ticket:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.supportTicket}}
+        </div>
+      </div>
+      <div class="row details-modal-row" *ngIf="supTicketInfo.isScreenShot == true">
+        <div class="col-sm-4">
+          <strong>Screenshot:</strong>
+        </div>
+        <div class="col-sm-8">
+          <a style="color: #166dba;" (click)="viewScreenshot(supTicketInfo.screenShot)">View</a>
+        </div>
+      </div>
+      <div class="row details-modal-row" *ngIf="supTicketInfo.isScreenShot == false">
+        <div class="col-sm-4">
+          <strong>Screenshot:</strong>
+        </div>
+        <div class="col-sm-8">
+          N/A
+        </div>
+      </div>
+
+      <div class="row details-modal-row" *ngIf="supTicketInfo.resolved == true">
+        <div class="col-sm-4">
+          <strong>Resolution Note:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.resolutionNote}}
+        </div>
+      </div>
+
+      <div class="row details-modal-row" *ngIf="supTicketInfo.resolved == true">
+        <div class="col-sm-4">
+          <strong>Resolved Date:</strong>
+        </div>
+        <div class="col-sm-8">
+          {{supTicketInfo.resolvedDate | date: mediumDate}}
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<div class="content-header">
+  <div class="page-header page-header-default">
+    <div class="page-header-content breadcrumb-line">
+      <div class="page-title upper-breadcrumb">
+        <h4>
+          <span class="icon-home"></span>Support/Tickets</h4>
+      </div>
+      <ul class="breadcrumb-elements breadcrumb-elements-cus">
+        <li>
+          <a href="javascript:void(0)">
+            <i class="icon-calendar-empty position-left"></i> {{ time | date:'MMM dd,yyyy HH:mm:ss'}}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="breadcrumb-line">
+      <ul class="breadcrumb">
+        <li>
+          <a routerLink="/admin/dashboard"> Home</a>
+        </li>
+        <li class="active">Support/Tickets</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="content">
+  <div class="row">
+    <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <div class="info-box">
+        <div class="icon bg-pink">
+          <i class="icon-users2"></i>
+        </div>
+        <div class="content">
+          <div class="text">Total No of Tickets</div>
+          <div class="number pinktext">
+            <div counto [step]="30" [countTo]="totalSupTickets" [countFrom]="0" [duration]="2" (countoChange)="a = $event">
+              {{a | number:'1.0-0'}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <div class="info-box">
+        <div class="icon bg-green ">
+          <i class="icon-graph"></i>
+        </div>
+        <div class="content">
+          <div class="text">Open Tickets</div>
+          <div class="number greentext">
+            <div counto [step]="30" [countTo]="openTickets" [countFrom]="0" [duration]="2" (countoChange)="b = $event">
+              {{b | number:'1.0-0'}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+      <div class="info-box">
+        <div class="icon bg-orange">
+          <i class="icon-star"></i>
+        </div>
+        <div class="content">
+          <div class="text">Resolved Tickets</div>
+          <div class="number orangetext">
+            <div counto [step]="30" [countTo]="resTickets" [countFrom]="0" [duration]="2" (countoChange)="c = $event">
+              {{c | number:'1.0-0'}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Basic datatable -->
+  <div class="panel panel-flat">
+    <div class="panel-heading">
+      <h5 class="panel-title">Support/Tickets</h5>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="margin-bottom-10">
+            <input type="text" [(ngModel)]="body.searchText" name="searchText" (change)="getAllSupportTickets()" placeholder="Quick Search">
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="pull-right mar-0">
+                <div class="wi-60">
+                  <button type="button" class="btn btn-default btn-sm display-inline-block" (click)="showDialog()">Advance Find
+                    <i class="fa fa-search position-right"></i>
+                  </button>
+                </div>
+                <div class="wi-60">
+                  <select class="btn dropdown-toggle legitRipple cus-select m-0-0" data-toggle="dropdown" aria-expanded="false" [(ngModel)]="selectFac"
+                    name="selectDate" style="text-transform: none" (click)="getOptedCmpSupTicket()">
+                    <option class="form-control" selected value="">All</option>
+                    <option class="form-control" *ngFor="let x of facilityList" [value]="x.userFacId">{{x.facName}}</option>
+                  </select>
+                </div>
+                <div class="wi-60">
+                  <select class="btn dropdown-toggle legitRipple cus-select m-0-0" data-toggle="dropdown" name="exportfile" [(ngModel)]="exportfile"
+                    (click)="exportAll(exportfile)">
+                    <option value="">Export</option>
+                    <option value="json">JSON</option>
+                    <option value="txt">TXT</option>
+                    <option value="csv">CSV</option>
+                    <option value="xls">MS-Excel</option>
+                    <option value="xml">XML</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table datatable-basic table-padding td-padding">
+        <thead>
+          <tr>
+            <th>
+              <i class="fa fa-calendar"></i>&nbsp;Date
+              <i *ngIf="asc =='desc'" class="fa fa-sort-amount-asc" (click)="sort('createdAt','asc')" aria-hidden="true"></i>
+              <i *ngIf="asc =='asc'" class="fa fa-sort-amount-desc" (click)="sort('createdAt','desc')" aria-hidden="true"></i>
+            </th>
+            <th>
+              <i class="far fa-building"></i>&nbsp;Company
+              <i *ngIf="asc =='desc'" class="fa fa-sort-amount-asc" (click)="sort('cmpName','asc')" aria-hidden="true"></i>
+              <i *ngIf="asc =='asc'" class="fa fa-sort-amount-desc" (click)="sort('cmpName','desc')" aria-hidden="true"></i>
+            </th>
+            <th>
+              <i class="fa fa-building-o"></i>&nbsp;Facility
+              <i *ngIf="asc =='desc'" class="fa fa-sort-amount-asc" (click)="sort('facName','asc')" aria-hidden="true"></i>
+              <i *ngIf="asc =='asc'" class="fa fa-sort-amount-desc" (click)="sort('facName','desc')" aria-hidden="true"></i>
+            </th>
+            <th>
+              Screenshot
+            </th>
+            <th>
+              Status
+            </th>
+            <th>
+              <i class="fa fa-question-circle-o"></i>&nbsp;Support
+            </th>
+            <th width="100">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- <tr> -->
+          <tr *ngIf="totalItems == 0">
+            <td colspan="9">
+              <div class="alert alert-default alert-dismissable">
+                No Tickets found!
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let ld of listData">
+            <td>{{ld.createdAt | date: mediumDate}}</td>
+            <td>{{ld.cmpName ? ld.cmpName: 'N/A'}}</td>
+            <td>{{ld.facName ? ld.facName: 'N/A'}}</td>
+            <td>
+              <span *ngIf="ld.isScreenShot == true">
+                <a (click)="viewScreenshot(ld.screenShot)">View</a>
+              </span>
+              <span *ngIf="ld.isScreenShot == false">
+                N/A
+              </span>
+            </td>
+            <td>{{(ld.resolved == true)? 'Resolved': 'Unresolved'}}</td>
+            <td>{{ld.supportTicket}}</td>
+            <td>
+              <div class="dropdown incident-rep-drop">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                  Action
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a (click)="viewSupportTicket(ld)">
+                      <i class="fa fa-eye"></i>View</a>
+                  </li>
+                  <li *ngIf="ld.resolved == false">
+                    <a (click)="changeTicketStatusToResolved(ld._id);">
+                      <i class="fa fa-check"></i>Resolved</a>
+                  </li>
+                  <li>
+                    <a href="mailto:{{ld.email}}">
+                      <i class="fa fa-envelope"></i>Email</a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box-footer footerDe padding-bottom-15">
+      <div class="row">
+        <div class="col-sm-3">
+          <div class="page-select">
+            <select class="form-control cusselect" #prPage (change)="changePageLimit(prPage.value)">
+              <option *ngFor="let pgarr of config.perPageArray" [value]="pgarr.val" [selected]="pgarr.val == body.count">{{pgarr.text}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-9">
+          <pagination class="pull-right m-r-10" [totalItems]="totalItems" [itemsPerPage]="body.count" [(ngModel)]="body.page" (pageChanged)="pageChanged($event)"
+            [maxSize]="5" [boundaryLinks]="true" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;"
+            lastText="&raquo;"></pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
